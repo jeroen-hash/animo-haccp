@@ -1,99 +1,18 @@
-<!doctype html>
-<html lang="nl">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>ANIMO HACCP</title>
-  <link rel="stylesheet" href="style.css">
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-</head>
-<body>
-  <div id="toast" role="status"></div>
-
-  <section id="auth" class="auth">
-    <div class="login">
-      <div class="logo">A✓</div>
-      <h1>ANIMO HACCP</h1>
-      <p>Altijd klaar voor FAVV</p>
-      <div class="tabs">
-        <button id="loginTab" class="active" type="button">Inloggen</button>
-        <button id="signupTab" type="button">Account maken</button>
-      </div>
-      <form id="authForm">
-        <label>E-mailadres<input id="email" type="email" required></label>
-        <label>Wachtwoord<input id="password" type="password" minlength="8" required></label>
-        <button id="authBtn" class="primary">Inloggen</button>
-      </form>
-      <button id="forgot" class="link" type="button">Wachtwoord vergeten?</button>
-      <p id="authMsg"></p>
-    </div>
-  </section>
-
-  <section id="recovery" class="auth" hidden>
-    <div class="login">
-      <div class="logo">A✓</div>
-      <h1>Nieuw wachtwoord</h1>
-      <form id="recoveryForm">
-        <label>Nieuw wachtwoord<input id="pw1" type="password" minlength="8" required></label>
-        <label>Herhaal wachtwoord<input id="pw2" type="password" minlength="8" required></label>
-        <button class="primary">Bewaren</button>
-      </form>
-      <p id="recoveryMsg"></p>
-    </div>
-  </section>
-
-  <div id="app" hidden>
-    <header>
-      <div class="brand"><div class="logo small">A✓</div><div><b>ANIMO HACCP</b><small>Altijd klaar voor FAVV</small></div></div>
-      <div><span id="userEmail"></span><button id="logout">Uitloggen</button></div>
-    </header>
-    <div class="shell">
-      <nav>
-        <button data-page="dash" class="active">Overzicht</button>
-        <button data-page="temps">Temperaturen</button>
-        <button data-page="clean">Kuisplan</button>
-        <button data-page="actions">Acties <span id="actionCount">0</span></button>
-        <button data-page="allergens">Allergenenplan</button>
-        <button data-page="reports">Rapporten</button>
-        <button data-page="manage">Beheer</button>
-      </nav>
-      <main>
-        <section id="dash" class="page active">
-          <div class="title"><div><h1>Overzicht</h1><p class="muted">Registraties en taken van vandaag.</p></div><button id="mailReport" class="primary" type="button">Dag afsluiten en mailen</button></div>
-          <div class="stats"><article><span>Temperaturen</span><b id="sTemp">0</b></article><article><span>Kuistaken</span><b id="sClean">0</b></article><article><span>Open acties</span><b id="sAct">0</b></article><article><span>Gerechten</span><b id="sAllerg">0</b></article></div>
-        </section>
-        <section id="temps" class="page"><h1>Temperatuurchecklist</h1><div id="tempList" class="cards"></div></section>
-        <section id="clean" class="page"><h1>Kuisplan</h1><div id="cleanList" class="cards"></div></section>
-        <section id="actions" class="page"><h1>Temperatuuracties</h1><div id="actionList" class="cards"></div></section>
-        <section id="allergens" class="page"><div class="title"><div><h1>Allergenenplan</h1></div><div><button id="allergenPdfBtn">Allergenenplan als PDF</button><button id="newDish" class="primary">+ Gerecht</button></div></div><div id="dishList" class="cards"></div></section>
-        <section id="reports" class="page"><h1>Rapporten</h1><p class="muted">Open hier het professionele rapport.</p><button id="reportBtn" class="primary">Rapport openen</button></section>
-        <section id="manage" class="page"><h1>Beheer</h1><div class="manage"><form id="settings" class="card"><h2>Bedrijfsgegevens</h2><label>Bedrijfsnaam<input name="company_name" required></label><label>Vestiging<input name="site_name"></label><label>Adres<input name="address"></label><label>E-mail eigenaar<input name="owner_email" type="email"></label><button class="primary">Opslaan</button></form><div class="card"><h2>Temperatuurlijst</h2><div id="deviceManage"></div><button id="addDevice">+ Toestel</button></div><div class="card"><h2>Kuislijst</h2><div id="cleanManage"></div><button id="addClean">+ Taak</button></div><section class="card team-card"><div class="title"><div><h2>Teamleden</h2><p class="muted">Frontendlijst met uitnodigingslink voor personen zonder account.</p></div><button id="addTeamMember" class="primary" type="button">+ Teamlid</button></div><div id="teamList"></div></section></div></section>
-      </main>
-    </div>
-  </div>
-
-  <dialog id="teamDialog">
-    <form id="teamForm">
-      <input name="id" type="hidden">
-      <h2>Teamlid toevoegen</h2>
-      <label>Naam<input name="name"></label>
-      <label>E-mailadres<input name="email" type="email" required></label>
-      <label>Rol<select name="role"><option value="employee">Medewerker</option><option value="manager">Manager</option><option value="owner">Eigenaar</option></select></label>
-      <div class="buttons"><button type="button" data-close>Annuleren</button><button class="primary">Bewaren</button></div>
-    </form>
-  </dialog>
-
-  <dialog id="closeDayDialog">
-    <form id="closeDayForm">
-      <h2>Dag afsluiten</h2>
-      <div id="closeDaySummary"></div>
-      <label>Afgesloten door<input name="closed_by" required></label>
-      <label>Opmerking<textarea name="note"></textarea></label>
-      <div class="buttons"><button type="button" data-close>Annuleren</button><button class="primary">Overzicht openen en mail voorbereiden</button></div>
-    </form>
-  </dialog>
-
-  <script src="config.js"></script>
-  <script src="app.js"></script>
-</body>
-</html>
+<!doctype html><html lang="nl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>ANIMO HACCP V14</title><link rel="stylesheet" href="style.css"><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script></head><body>
+<div id="toast"></div>
+<section id="auth" class="auth"><div class="login"><div class="logo">A✓</div><h1>ANIMO HACCP</h1><p>Altijd klaar voor FAVV</p><div class="tabs"><button id="loginTab" class="active">Inloggen</button><button id="signupTab">Account maken</button></div><form id="authForm"><label>E-mailadres<input name="email" type="email" required></label><label>Wachtwoord<input name="password" type="password" minlength="8" required></label><button id="authButton" class="primary">Inloggen</button></form><button id="forgotButton" class="link">Wachtwoord vergeten?</button><p id="authMessage"></p></div></section>
+<div id="app" hidden><header><div class="brand"><span class="logo small">A✓</span><div><b>ANIMO HACCP</b><small>Frontend V14</small></div></div><div><span id="userEmail"></span><button id="logoutButton">Uitloggen</button></div></header><div class="shell"><nav id="nav"><button data-page="dashboard" class="active">Overzicht</button><button data-page="temperatures">Temperaturen</button><button data-page="cleaning">Kuisplan</button><button data-page="actions">Acties <span id="actionBadge">0</span></button><button data-page="allergens">Allergenen</button><button data-page="reports">Rapporten</button><button data-page="manage">Beheer</button></nav><main>
+<section id="dashboard" class="page active"><div class="title"><div><h1>Overzicht</h1><p>Registraties en taken van vandaag.</p></div><button id="closeDayButton" class="primary">Dag afsluiten en mailen</button></div><div class="stats"><article><span>Temperaturen vandaag</span><b id="temperatureStat">0/4</b></article><article><span>Kuistaken vandaag</span><b id="cleaningStat">0/13</b></article><article><span>Open acties</span><b id="actionStat">0</b></article><article><span>Gerechten</span><b id="allergenStat">0</b></article></div><div class="legend"><span><i class="dot green"></i> In orde</span><span><i class="dot orange"></i> Nog te doen</span><span><i class="dot red"></i> Actie vereist</span></div></section>
+<section id="temperatures" class="page"><div class="title"><div><h1>Temperaturen</h1><p>De laatste meting van vandaag bepaalt de kleur.</p></div></div><div id="temperatureList" class="cards"></div></section>
+<section id="cleaning" class="page"><div class="title"><div><h1>Kuisplan</h1><p>Vink de uitgevoerde taken af.</p></div></div><div id="cleaningList" class="cards"></div></section>
+<section id="actions" class="page"><div class="title"><div><h1>Correctieve acties</h1><p>Afwijkingen en vereiste maatregelen.</p></div><button id="addActionButton" class="primary">Nieuwe actie</button></div><div id="actionList" class="cards"></div></section>
+<section id="allergens" class="page"><div class="title"><div><h1>Allergenenplan</h1><p>Gerechten, ingrediënten en allergenen.</p></div><div><button id="allergenPdfButton">Opslaan als PDF</button><button id="addDishButton" class="primary">+ Gerecht</button></div></div><div id="dishList" class="cards"></div></section>
+<section id="reports" class="page"><h1>Rapporten</h1><div class="card"><p>Open een afdrukvriendelijk dagrapport.</p><button id="reportButton" class="primary">Dagrapport openen</button></div></section>
+<section id="manage" class="page"><h1>Beheer</h1><div class="manage"><form id="settingsForm" class="card"><h2>Bedrijfsgegevens</h2><label>Bedrijfsnaam<input name="company_name" required></label><label>Vestiging<input name="site_name"></label><label>Adres<input name="address"></label><label>E-mail eigenaar<input name="owner_email" type="email" required></label><button class="primary">Opslaan</button></form><section class="card full"><div class="title"><div><h2>Teamleden</h2><p>Uitnodigingen worden automatisch per e-mail verstuurd.</p></div><button id="inviteButton" class="primary">+ Teamlid uitnodigen</button></div><div id="teamList"></div></section><section class="card"><div class="title"><h2>Temperatuurlijst</h2><button id="restoreTemperatures">Herstellen</button></div><div id="temperatureManage"></div></section><section class="card"><div class="title"><h2>Standaard kuisplan</h2><button id="restoreCleaning">Herstellen</button></div><div id="cleaningManage"></div></section></div></section>
+</main></div></div>
+<dialog id="temperatureDialog"><form id="temperatureForm"><input name="id" type="hidden"><h2 id="temperatureTitle">Temperatuur meten</h2><label>Temperatuur °C<input name="temperature" type="number" step="0.1" required></label><label>Uitgevoerd door<input name="employee" required></label><label>Opmerking<textarea name="note"></textarea></label><fieldset id="correctionFields" hidden><legend>Afwijking: actie verplicht</legend><label>Oorzaak<textarea name="cause"></textarea></label><label>Maatregel<textarea name="measure"></textarea></label></fieldset><div class="buttons"><button type="button" data-close>Annuleren</button><button class="primary">Opslaan</button></div></form></dialog>
+<dialog id="cleaningDialog"><form id="cleaningForm"><input name="id" type="hidden"><h2 id="cleaningTitle">Kuistaak</h2><label>Uitgevoerd door<input name="employee" required></label><label>Opmerking<textarea name="note"></textarea></label><div class="buttons"><button type="button" data-close>Annuleren</button><button class="primary">Voltooid</button></div></form></dialog>
+<dialog id="actionDialog"><form id="actionForm"><h2>Nieuwe actie</h2><label>Probleem<input name="problem" required></label><label>Maatregel<textarea name="measure" required></textarea></label><label>Verantwoordelijke<input name="owner" required></label><div class="buttons"><button type="button" data-close>Annuleren</button><button class="primary">Opslaan</button></div></form></dialog>
+<dialog id="dishDialog"><form id="dishForm"><h2>Nieuw gerecht</h2><label>Gerecht<input name="dish_name" required></label><label>Categorie<input name="category"></label><label>Ingrediënten<textarea name="ingredients" required></textarea></label><label>Allergenen<input name="allergens" placeholder="gluten, melk, ei"></label><label>Kruisbesmetting<textarea name="cross_contamination"></textarea></label><div class="buttons"><button type="button" data-close>Annuleren</button><button class="primary">Opslaan</button></div></form></dialog>
+<dialog id="inviteDialog"><form id="inviteForm"><h2>Teamlid uitnodigen</h2><label>Naam<input name="name"></label><label>E-mailadres<input name="email" type="email" required></label><label>Rol<select name="role"><option value="employee">Medewerker</option><option value="manager">Manager</option><option value="owner">Eigenaar</option></select></label><div class="buttons"><button type="button" data-close>Annuleren</button><button class="primary">Uitnodiging versturen</button></div></form></dialog>
+<script src="config.js"></script><script src="app.js"></script></body></html>
